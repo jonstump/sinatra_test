@@ -54,7 +54,7 @@ end
 
 patch('/albums/:id') do
   @album = Album.find(params[:id].to_i())
-  @album.update(params[:name], params[:artist], params[:year], params[:genre])
+  @album.update(params[:name], params[:artist], params[:year], params[:genre], nil)
   @albums = Album.all
   erb(:albums)
 end
