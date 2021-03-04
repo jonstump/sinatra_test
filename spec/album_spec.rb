@@ -93,4 +93,14 @@ describe '#Album' do
       expect(album.songs).to(eq([song, song2]))
     end
   end
+
+  describe('.sort') do
+    it('') do
+      album = Album.new("Giant Steps", nil, nil, nil, nil)
+      album.save()
+      album2 = Album.new("Blue", nil, nil, nil, nil)
+      album2.save()
+      expect(Album.album_sort()).to(eq([album2, album]))
+    end
+  end
 end
