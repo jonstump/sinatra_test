@@ -1,11 +1,20 @@
 <h2>Song: <%= @song.name %></h2>
 <h3>Album: <%= @song.album.name %></h3>
+<h3>Song Writer: <%= @song.song_writer %></h3>
+<h3>Lyrics: <%= @song.lyrics %></h3>
 
 <form action="/albums/<%= @song.album.id %>/songs/<%= @song.id %>" method="post">
   <input name="_method" type="hidden" value="patch">
 
   <label for="name">Rename song</label>
-  <input id="name" name="name" type="text">
+  <input id="name" name="name" type="text" class="form-control" value= "<%= @song.name %>">
+  <br>
+  <label for="writer">Rename the song Writer</label>
+  <input id="writer" name="writer" type="text" class="form-control" value= "<%= @song.song_writer %>">
+  <br>
+  <label for="lyrics">Edit the lyrics of the song!</label>
+  <textarea rows= "5" cols = "60" id="lyrics" name="lyrics" class="form-control" type="text"><%= @song.lyrics %></textarea>
+  <br>
 
   <button type="submit">Update song</button>
 </form>
