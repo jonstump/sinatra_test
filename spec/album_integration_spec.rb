@@ -36,8 +36,8 @@ describe('Checks that you can search for an album', {:type => :feature}) do
 end
 
 describe('create a song path', {:type => :feature}) do
-  it('creates an album and then goes to the album page and adds a song') do
-    album = Album.new("Yellow Submarine", nil, nil, nil, nil)
+  it('creates an album and then goes to the album page') do
+    album = Album.new({name:"Yellow Submarine"})
     album.save
     visit("/albums/#{album.id}")
     fill_in('song_name', :with => 'All You Need Is Love')
@@ -46,53 +46,19 @@ describe('create a song path', {:type => :feature}) do
   end
 end
 
-describe('adds song name and writer to song', {:type => :feature}) do
-  it('creates an album and then goes to the album page then adds songwriter and song') do
-    album = Album.new("Yellow Submarine", nil, nil, nil, nil)
+describe('create an edit song path', {:type => :feature}) do
+  it('create an album, goes to album page, adds the song, then updates the song') do
+    album = Album.new({name: "Pork Soda"})
     album.save
     visit("/albums/#{album.id}")
-    fill_in('song_name', :with => 'Living on a prayer')
-    fill_in('song_writer', :with => 'Bon Jovi')
-    fill_in('song_lyrics', :with => 'Living on a prayer!')
+    fill_in('song_name', :with => 'DMV')
     click_on('Add song')
-    click_on('Living on a prayer')
-    expect(page).to have_content('Bon Jovi')
-    expect(page).to have_content('Living on a prayer!')
-    fill_in('lyrics', :with => 'We are half way there')
+    click_on('DMV')
+    fill_in('name', :with => 'My Name is Mud')
+    fill_in('writer', :with => 'Les Claypool')
+    fill_in('lyrics', :with => 'My name is mud')
     click_on('Update song')
-    click_on('Living on a prayer')
-    expect(page).to have_content('We are half way there')
-    click_on('Delete song')
-    expect(page).to have_no_content('Living on a prayer')
+    click_on('My Name is Mud')
+    expect(page).to have_content('My Name is Mud')
   end
 end
-
-# describe('adds song name and writer to song', {:type => :feature}) do
-#   it('creates an album and then goes to the album page then adds songwriter and song') do
-#     album = Album.new("Yellow Submarine", nil, nil, nil, nil)
-#     album.save
-#     visit("/albums/#{album.id}")
-#     fill_in('song_name', :with => 'Living on a prayer')
-#     fill_in('song_writer', :with => 'Bon Jovi')
-#     fill_in('song_lyrics', :with => 'Living on a prayer!')
-#     click_on('Add song')
-#     click_on('Living on a prayer')
-#     fill_in('lyrics', :with => 'We are half way there')
-#     click_on('Update song')
-#     click_on('Living on a prayer')
-#     expect(page).to have_content('We are half way there')
-#   end
-# end
-
-# describe('adding song lyrics', {:type => :feature}) do
-#   it('creates an album and then goes to the album page') do
-#     album = Album.new("Yellow Submarine", nil, nil, nil, nil)
-#     album.save
-#     visit("/albums/#{album.id}")
-#     fill_in('song_name', :with => 'Living on a prayer')
-#     fill_in('song_lyrics', :with => 'Living on a prayer!')
-#     click_on('Add song')
-#     click_on('Living on a prayer')
-#     expect(page).to have_content('Living on a prayer!')
-#   end
-# end

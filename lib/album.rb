@@ -1,23 +1,29 @@
 class Album
   attr_reader :id
-  attr_accessor :name, :year, :genre, :artist
-  @@albums = {}
-  @@total_rows = 0
+  attr_accessor :name, :year, :genre
 
-  def initialize(name, artist, year, genre, id)
-    @name = name
-    @artist = artist
-    @year = year
-    @genre = genre
-    @id = id || @@total_rows += 1
+  def initialize(attrs)
+    @name = attrs[:name]
+    # @artist = attrs[:artist]
+    @year = attrs[:year]
+    @genre = attrs[:genre]
+    @id = attrs[:id]
   end
 
   def self.all
-    @@albums.values()
+    returned_albums = DB.exec('SELECT * FROM albums;')
+    albums = []
+    returned_albums.each() do |album|
+      name = album.fetch("name")
+      id = album.fetch("id").to_i
+      albums.push(Album.new({:name => name, :id => id}))
+    end
+    albums
   end
 
   def save
-    @@albums[self.id] = Album.new(self.name, self.artist, self.year, self.genre, self.id)
+    result = DB.exec("INSERT INTO albums (name, year, genre) VALUES ('#{@name}', '#{@year}', '#{@genre}' ) RETURNING id;")
+    @id = result.first().fetch("id").to_i
   end
 
   def ==(album_to_compare)
@@ -25,35 +31,59 @@ class Album
   end
 
   def self.clear
-    @@albums = {}
-    @@total_rows = 0
+    DB.exec("DELETE FROM albums * ;")
   end
 
   def self.find(id)
-    @@albums[id]
+    album = DB.exec("SELECT * FROM albums WHERE id = #{id};").first
+    name = album.fetch("name")    
+    id = album.fetch("id")
+    genre = album.fetch("genre")
+    year = album.fetch("year")
+    Album.new({:name => name, :id => id, :year => year, :genre => genre})
   end
 
-  def update(name, artist, year, genre, id)
-    self.name = name
-    self.artist = artist
-    self.year = year
-    self.genre = genre
-    @@albums[self.id] = Album.new(self.name, self.artist, self.year, self.genre, self.id)
+  def update(attributes)  
+    if (attributes.has_key?(:name)) && (attributes.fetch(:name) != nil)
+      name = attributes.fetch(:name)
+      DB.exec("UPDATE albums SET name = '#{@name}' WHERE id = #{@id};")
+    end
+    if (attributes.has_key?(:year)) && (attributes.fetch(:year) != nil)
+      @year = attributes.fetch(:year)
+      DB.exec("UPDATE albums SET year = '#{@year}' WHERE id = #{@id};")
+    end
+    if (attributes.has_key?(:genre)) && (attributes.fetch(:genre) != nil)
+      @genre = attributes.fetch(:genre)
+      DB.exec("UPDATE albums SET genre = '#{@genre}' WHERE id = #{@id};")
+    end
   end
 
   def delete()
-    @@albums.delete(self.id)
+    DB.exec("DELETE FROM albums WHERE id = #{@id};")
+    DB.exec("DELETE FROM songs WHERE album_id = #{@id};")
   end
 
-  def self.search(search_term)
-    @@albums.values.select { |album| album.name == search_term }
-  end
+#   def self.search(search_term)
+#     @@albums.values.select { |album| album.name == search_term }
+#   end
 
   def songs
     Song.find_by_album(self.id)
   end
 
-  def self.album_sort()
-    @@albums.values.sort_by { |album| [album.name] }
+#   def self.album_sort()
+#     @@albums.values.sort_by { |album| [album.name] }
+#   end
+
+def artists
+  artists = []
+  results = DB.exec("SELECT artist_id FROM albums_artists WHERE album_id = #{@id};")
+  results.each() do |result|
+    artist_id = result.fetch("artist_id").to_i()
+    artist = DB.exec("SELECT * FROM artists WHERE id = #{artist_id};")
+    name = artist.first().fetch("name")
+    artists.push(Artist.new({:name => name, :id => artist_id}))
+    end
+    artists
   end
 end

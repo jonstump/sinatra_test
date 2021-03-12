@@ -1,0 +1,26 @@
+<h1>All Sales Vinyl</h1>
+
+<h3>Artists</h3>
+
+<% if @artists.any? %>
+  <ul>
+    <% @artists.each do |artist| %>
+      <li><a href="/artists/<%= artist.id %>"><%= artist.name %></a></li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>There are currently no artists to display.</p>
+<% end %>
+
+<h4>Add new artist:</h4>
+<form action="/artists" method="post">
+  <div class="form-group">
+    <label for="artist_name">Artist name</label>
+    <input id="artist_name" name="artist_name" class="form-control" required type="text">
+  </div>
+  <button type="submit" class="btn">Add artist</button>
+</form><br>
+
+
+<a href="/albums">Back to main page.</a>
+
