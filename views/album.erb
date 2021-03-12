@@ -1,5 +1,19 @@
 <h4>Album Name: <%= @album.name %></h4>
-<h4>Artist: <%= @album.artist %></h4>
+<h4>Artist: 
+<ul>
+<% if @artists.any? %>
+  <ul>
+    <% @artists.each do |artist| %>
+    <li><a href="/artists/<%= artist.id %>"><%= artist.name %></a></li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>There are no artists listed for this album.</p>
+<% end %></h4>
+
+
+
+
 <h4>Album Year: <%= @album.year %></h4>
 <h4>Album Genre: <%= @album.genre %></h4><br>
 
@@ -14,7 +28,7 @@
     </ul>
   <% else %>
     <p>There are no songs listed for this album yet.</p>
-  <% end %>
+  <% end %><br>
 
 <h4>Add a song:</h4>
 
@@ -28,7 +42,7 @@
     <textarea rows= "5" cols = "60" id="song_lyrics" name="song_lyrics" class="form-control" type="text"></textarea>
   </div>
   <button type="submit" class="btn">Add song</button>
-</form>
+</form><br>
 
 <p><a href="/albums/<%= @album.id %>/edit">Edit album</a></p>
 <a href="/albums">Return to album list</a>

@@ -2,29 +2,28 @@ require 'rspec'
 require 'song'
 require 'album'
 require 'pry'
+require 'spec_helper'
 
 describe '#Song' do
 
   before(:each) do
-    Album.clear()
-    Song.clear()
-    @album = Album.new("Giant Steps", nil, nil, nil, nil)
+    @album = Album.new({name: "Giant Steps"})
     @album.save()
   end
 
   describe('#==') do
     it("is the same song if it has the same attributes as another song") do
-      song = Song.new("Naima", @album.id, nil, nil, nil)
-      song2 = Song.new("Naima", @album.id, nil, nil, nil)
+      song = Song.new({name: "Naima", album_id: @album.id})
+      song2 = Song.new({name: "Naima", album_id: @album.id})
       expect(song).to(eq(song2))
     end
   end
 
   describe('.all') do
     it("returns a list of all songs") do
-      song = Song.new("Giant Steps", @album.id, nil, nil, nil)
+      song = Song.new({name: "Giant Steps", album_id: @album.id})
       song.save()
-      song2 = Song.new("Naima", @album.id, nil, nil, nil)
+      song2 = Song.new({name: "Naima", album_id: @album.id})
       song2.save()
       expect(Song.all).to(eq([song, song2]))
     end
@@ -32,9 +31,9 @@ describe '#Song' do
 
   describe('.clear') do
     it("clears all songs") do
-      song = Song.new("Giant Steps", @album.id, nil, nil, nil)
+      song = Song.new({name: "Giant Steps", album_id: @album.id})
       song.save()
-      song2 = Song.new("Naima", @album.id, nil, nil, nil)
+      song2 = Song.new({name: "Naima", album_id: @album.id})
       song2.save()
       Song.clear()
       expect(Song.all).to(eq([]))
@@ -43,7 +42,7 @@ describe '#Song' do
 
   describe('#save') do
     it("saves a song") do
-      song = Song.new("Naima", @album.id, nil, nil, nil)
+      song = Song.new({name: "Naima", album_id: @album.id})
       song.save()
       expect(Song.all).to(eq([song]))
     end
@@ -51,9 +50,9 @@ describe '#Song' do
 
   describe('.find') do
     it("finds a song by id") do
-      song = Song.new("Giant Steps", @album.id, nil, nil, nil)
+      song = Song.new({name: "Giant Steps", album_id: @album.id})
       song.save()
-      song2 = Song.new("Naima", @album.id, nil, nil, nil)
+      song2 = Song.new({name: "Naima", album_id: @album.id})
       song2.save()
       expect(Song.find(song.id)).to(eq(song))
     end
@@ -61,7 +60,7 @@ describe '#Song' do
 
   describe('#update') do
     it("updates an song by id") do
-      song = Song.new("Naima", @album.id, nil, nil, nil)
+      song = Song.new({name: "Naima", album_id: @album.id})
       song.save()
       song.update("Mr. P.C.", @album.id, nil, nil)
       expect(song.name).to(eq("Mr. P.C."))
@@ -70,9 +69,9 @@ describe '#Song' do
 
   describe('#delete') do
     it("deletes an song by id") do
-      song = Song.new("Giant Steps", @album.id, nil, nil, nil)
+      song = Song.new({name: "Giant Steps", album_id: @album.id})
       song.save()
-      song2 = Song.new("Naima", @album.id, nil, nil, nil)
+      song2 = Song.new({name: "Naima", album_id: @album.id})
       song2.save()
       song.delete()
       expect(Song.all).to(eq([song2]))
@@ -81,11 +80,11 @@ describe '#Song' do
 
   describe('.find_by_album') do
     it("finds songs for an album") do
-      album2 = Album.new("Blue", nil, nil, nil, nil)
+      album2 = Album.new({name: "Blue"})
       album2.save
-      song = Song.new("Naima", @album.id, nil, nil, nil)
+      song = Song.new({name: "Naima", album_id: @album.id})
       song.save()
-      song2 = Song.new("California", album2.id , nil, nil, nil)
+      song2 = Song.new({name: "California", album_id: album2.id})
       song2.save()
       expect(Song.find_by_album(album2.id)).to(eq([song2]))
     end
@@ -93,7 +92,7 @@ describe '#Song' do
 
   describe('#album') do
   it("finds the album a song belongs to") do
-    song = Song.new("Naima", @album.id, nil, nil, nil)
+    song = Song.new({name: "Naima", album_id: @album.id})
     song.save()
     expect(song.album()).to(eq(@album))
     end

@@ -3,7 +3,11 @@ require('sinatra/reloader')
 require('./lib/album')
 require('pry')
 require('./lib/song')
+require('./lib/artist')
+require('pg')
 also_reload('lib/**/*.rb')
+
+DB = PG.connect({:dbname => 'record_store',  :user=>'postgres', :password => 'Epidorkus@11'})
 
 get('/') do
   @albums = Album.album_sort
@@ -32,18 +36,25 @@ end
 
 post('/albums') do
   name = params[:album_name]
-  artist = params[:album_artist]
   year = params[:album_year]
   genre = params[:album_genre]
-  album = Album.new(name, artist, year, genre, nil)
+  artist_name = params[:album_artist]
+  album = Album.new({name: name, year: year, genre: genre})
   album.save()
-  @albums = Album.album_sort
+  @albums = Album.all
+  if Artist.find_artist_by_name(artist_name) == nil
+    @artist = Artist.new({name: artist_name}) 
+    @artist.save()
+  else
+    @artist = Artist.find_artist_by_name(artist_name)
+  end
+  @artist.update({album_name: album.name})
   erb(:albums)
 end
 
 get('/albums/:id') do
   @album = Album.find(params[:id].to_i())
-  @albums = Album.album_sort
+  @artists = @album.artists
   erb(:album)
 end
 
@@ -54,9 +65,9 @@ end
 
 patch('/albums/:id') do
   @album = Album.find(params[:id].to_i())
-  @album.update(params[:name], params[:artist], params[:year], params[:genre], nil)
-  @albums = Album.album_sort
-  erb(:albums)
+  @album.update({name: params[:name], artist_name: params[:artist_name], year: params[:year], genre: params[:genre]})
+  @artists = @album.artists
+  erb(:album)
 end
 
 delete('/albums/:id') do
@@ -75,7 +86,7 @@ end
 # Post a new song. After the song is added, Sinatra will route to the view for the album the song belongs to.
 post('/albums/:id/songs') do
   @album = Album.find(params[:id].to_i())
-  song = Song.new(params[:song_name], @album.id, params[:song_writer], params[:song_lyrics], nil)
+  song = Song.new({name: params[:song_name], album_id: @album.id})
   song.save()
   erb(:album)
 end
@@ -94,6 +105,50 @@ delete('/albums/:id/songs/:song_id') do
   song.delete
   @album = Album.find(params[:id].to_i())
   erb(:album)
+end
+
+#Get a list of all artists
+get('/artists') do
+  @artists = Artist.all
+  erb(:artists)
+end
+
+#Look at the detail page for a single artist
+get('/artists/:id') do
+  @artist = Artist.find((params[:id].to_i()))
+  erb(:artist)
+end
+
+#Update a single artist
+patch('/artists/:id') do
+  @artist = Artist.find(params[:id].to_i())
+  @artist.update({name: params[:artist_name]})
+  erb(:artist)
+end
+
+post('/artists/:id') do
+  @artist = Artist.find(params[:id].to_i())
+  album = Album.new({name: (params[:album_name]), artist: @artist.name})
+  album.save()
+  @artist.update({album_name: album.name})
+  @albums = Album.all
+  erb(:artist)
+end
+
+#Add a new artist to the list of artists
+post('/artists') do
+  artist = Artist.new({name: params[:artist_name]})
+  artist.save()
+  @artists = Artist.all
+  erb(:artists)
+end
+
+#Delete an artist from the list
+delete('/artists/:id') do
+  artist = Artist.find(params[:id].to_i)
+  artist.delete
+  @artists = Artist.all
+  erb(:artists)
 end
 
 # get('/albums') do
